@@ -56,12 +56,16 @@ func Config_get(c *gin.Context, s *service.Service) {
 		return
 	}
 
-	keyStr := utils.RIGELPREFIX + "/" + *queryParams.App + "/" + *queryParams.Module + "/" + strconv.Itoa(queryParams.Version) + "/config/" + *queryParams.Config
+	keyStr := utils.RIGELPREFIX + "/" + *queryParams.App + "/" + *queryParams.Module + "/" + strconv.Itoa(queryParams.Version) + "/feilds/" + *queryParams.Config
 
 	getValue, err := client.GetWithPrefix(c, keyStr)
 	if err != nil {
 		wscutils.SendErrorResponse(c, wscutils.NewResponse(wscutils.ErrorStatus, nil, []wscutils.ErrorMessage{wscutils.BuildErrorMessage(wscutils.ErrcodeMissing, nil, err.Error())}))
-		lh.Debug0().LogActivity("error while get data from db error:", err.Error)
+		lh.Debug0().LogActivity("error while get data from db error:", "no record found")
+		return
+	} else if getValue != nil {
+		wscutils.SendErrorResponse(c, wscutils.NewResponse(wscutils.ErrorStatus, nil, []wscutils.ErrorMessage{wscutils.BuildErrorMessage(wscutils.ErrcodeMissing, nil)}))
+		lh.Debug0().LogActivity("error while get data from db error:", "no record found")
 		return
 	}
 	// set response fields
